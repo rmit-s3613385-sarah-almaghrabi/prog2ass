@@ -4,8 +4,8 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class Swimmer extends   Athelets {
 
-	public static final int MIN_TIME = 100;
-	public static final int MAX_TIME = 200;
+	private static final int MIN_TIME = 100;
+	private static final int MAX_TIME = 200;
 
 
 	public Swimmer(String id, String name, int age, String state) {

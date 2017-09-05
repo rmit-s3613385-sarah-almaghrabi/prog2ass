@@ -7,25 +7,26 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class Driver {
 	Scanner sn = new Scanner(System.in);
-	
+
 	// counters to track game number
 	AtomicInteger swimGameCounter = new AtomicInteger(1);
 	AtomicInteger runGameCounter = new AtomicInteger(1);
 	AtomicInteger cyclGameCounter = new AtomicInteger(1); 
-	
+
 	// each game must has a refree
 	Official   refree; 
-	
-	
+
+
 	// arraylist of players for each game 
 	ArrayList<Athelets> athelets = new ArrayList<Athelets> ();
-	
+
 	// to save the points of all the atheltes
 	TreeMap< String, Integer> results = new TreeMap<String , Integer> ();
 
 	// to keep history of all games have been played
 	HashMap<String , Athelets[] > history = new HashMap<String , Athelets[] > ();
 
+	String prediction=null;  
 
 	public String selectGame(String gameID){
 		//check if there is already a selected game 
@@ -54,7 +55,10 @@ public class Driver {
 					gameID = Game.createGameID('s', swimGameCounter.getAndIncrement());
 					System.out.println( "Swimming Game " + gameID +" Selected .. "  );
 					Game.creatPlayers("swimming");	
-					getPlayers();
+					//	getPlayers();
+					showPlayers();
+					selectPlayers(); 
+
 				}
 				return gameID; 
 				case 2 :
@@ -92,6 +96,32 @@ public class Driver {
 	}
 
 
+	public void selectPlayers() {
+		int input []=new int[8]; 
+		int count =0 , indx =0;
+		System.out.println("to run the game you must chose 5 to 8 players: "
+				+ "\n     ( Write their number or 0 to finish and exit ) ");
+		do{
+			System.out.println("chose the " +(count +1)+"th player" );
+			input[indx++]= Integer.parseInt(sn.next());
+
+			if(input[indx-1]==0 )
+
+				if(count <5 )
+				{
+					System.out.println("You have to have at least 5 players " );
+					continue;
+
+				}else 
+					break; 
+
+			count++;
+
+		}while( (count < 9 || count <5) );
+
+	}
+
+
 	public String startGame(String gameID, String prediction){
 		if(gameID==null)
 		{
@@ -101,7 +131,7 @@ public class Driver {
 			char x = gameID.charAt(0);
 			if (refree==null || athelets.size()<5  || athelets.size()>8 ){
 				System.out.println("Warning !! \n game must have at least 5 players "
-						+ "and must have an Oddicial");
+						+ "and must have an Official");
 			}else {
 				switch (x){
 				case 's': {
@@ -124,13 +154,16 @@ public class Driver {
 				for(Athelets s: athelets)
 					Game.startGame(s);
 				Collections.sort(athelets, Athelets.TimeComparator);
+
+
+				refree.showResults(athelets);
+
+				System.out.println( "		Refree [ "+ refree.getName()+ " ]" );
+
 				if(prediction!=null)
 				{
 					checkPrediction(prediction);
-				}
-
-				refree.showResults(athelets);
-				System.out.println( "Refree [ "+ refree.getName()+ " ]" );
+				} 
 
 				saveResults(gameID);
 
@@ -147,7 +180,7 @@ public class Driver {
 			// if the results list filled for first time 
 			if(results.get((a.getId() +"\t" + a.getName())) == null)
 				results.put((a.getId() +"\t" + a.getName()), a.getPoint());
-		    // if the results list already filled before .. update the points 
+		// if the results list already filled before .. update the points 
 			else
 			{
 				int pastPoint =  results.get((a.getId() +"\t" + a.getName())) ;
@@ -157,20 +190,35 @@ public class Driver {
 
 		// save all the games played before 
 		history.put(("Game " + gameID +"  Refree [ "+ refree.getName()+ " ]"  ) , 
-				 athelets.toArray(new Athelets[athelets.size()]));
+				athelets.toArray(new Athelets[athelets.size()]));
 
 		// clear the athelets list to be ready for another new game 
 		athelets.removeAll(athelets);
 	}
 
 	public void checkPrediction(String prediction) {
-		
-		if(athelets.get(0).getId().equals(prediction))
-			System.out.println("  ******* :)  CONGRATULATIONS -- :) YOU WON :) ******* ");
-		else 
-			System.out.println(":( Your prediction is not correct.. Try next time  " );
+		boolean found = false ; 
+		for(Athelets a : athelets){
+			if(a.getPoint()==5)
+				if(a.getId().equals(prediction))
+				{	
+					System.out.println("\n----------------------------------------------------");
+					System.out.println("         :)"
+							+ "\n    CONGRATULATIONS --"
+							+ "\n              YOU WON");
+					System.out.println("----------------------------------------------------");
+					//else 
+					found= true; 
+				}
+		}
+		if(!found){
+			System.out.println("\n----------------------------------------------------");
+			System.out.println("\n    :( "
+					+ "\n  Your prediction is not correct.. "
+					+ "\n              --     Try next time ");
+			System.out.println("----------------------------------------------------");
 
-		// clear prediction after checked it 
+		}
 		prediction  = null;
 	}
 
@@ -185,9 +233,30 @@ public class Driver {
 					athelets.add(ath);
 				else
 					break; 
-			}while(true);
+
+			}while(i<8);
 
 		}
+	}
+
+	public void showPlayers() {
+		int i=0;
+		Athelets ath;
+		do{ 
+			ath =  Game.getPlayers(i++);
+			if(ath!=null)
+				System.out.println((i) + "-  \t" + ath.getName() );
+			//athelets.add(ath);
+			else
+				break; 
+
+		}while(true);
+
+		/*	i=1;
+		for( Athelets a: athelets){
+			System.out.println(i++ + "-  \t" + a.getName() );
+
+		}*/ 
 	}
 
 	public String predictWinner(String gameID) {
@@ -196,7 +265,7 @@ public class Driver {
 			System.out.println("Sorry you have to select a game first");
 		}else  {
 
-			String prediction=null;  
+
 			boolean notValid =true;
 			System.out.println(" ******** Players List *********");
 			System.out.format("%8s%15s", "ID", "NAME" );
@@ -208,16 +277,18 @@ public class Driver {
 
 
 			System.out.println("NOTE : The format should be exactly similar to the ID shown ");
-			System.out.println("Enter the ID of your predected winner :  ");
+			System.out.println("Enter the ID of your predected winner, or 0 to return :  ");
 			do {
 				prediction = sn.nextLine();
 				if(prediction.trim().length()==0){
 					System.out.println("You didn't enter an id .. try again ..");
 					notValid=true; 
-				}else {
+				} else if( prediction.trim().equals("0")){
+					return null; 
+				} else{
 
 					for(Athelets s: athelets )
-						if( s.getId().equals(prediction.trim().toUpperCase()) )
+						if( s.getId().equals(prediction.trim().toUpperCase())  )
 						{
 							System.out.println("Got your Prediction .. " +s.getName());
 
@@ -243,8 +314,8 @@ public class Driver {
 			for (String name: this.history.keySet()){
 
 				System.out.println("\n=====================================");
-				System.out.println(name);
-				System.out.format("%8s%15s%15s", "ID", "NAME", "TIME"  );
+				System.out.println( name);
+				System.out.format("%10s%15s%15s", "ID", "NAME", "TIME"  );
 				System.out.println("\n-------------------------------------");
 
 				for (Athelets a : history.get(name)) 
@@ -262,9 +333,10 @@ public class Driver {
 			System.out.println("Sorry, the list is empty !! no game has been played before .. ");
 		else
 		{  
-			System.out.println("\n=====================================");
 
-			System.out.format("%8s%15s%15s", "ID", "NAME", "POINTS"  );
+			System.out.println("\n=====================================");
+			System.out.println("This is the list of athelets who already have played game ");
+			System.out.format("%10s%15s%15s", "ID", "NAME", "POINTS"  );
 			System.out.println("\n-------------------------------------");
 			MyComparator comparator = new MyComparator(results);
 			Map<String, Integer> newMap = new TreeMap<String, Integer>(comparator);
@@ -272,7 +344,7 @@ public class Driver {
 
 			for (String name: newMap.keySet()){
 				String [] line= name.split("\t");
-				System.out.format("%8s%15s%15d", line[0], line[1], results.get(name)   );
+				System.out.format("%10s%15s%15d", line[0], line[1], results.get(name)   );
 				System.out.println();
 
 			} 
@@ -283,7 +355,7 @@ public class Driver {
 	// this is inner class to sort the treeMapp by value 
 	// this part of code has been taken from this link:
 	// https://stackoverflow.com/questions/109383/sort-a-mapkey-value-by-values-java
-	
+
 	class MyComparator implements Comparator<Object> {
 		Map<String, Integer> map;
 		public MyComparator(Map<String, Integer> map) {

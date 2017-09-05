@@ -13,9 +13,9 @@ interface Game {
 
 	public static  Official createOffical(){
 		d.createOfficial();
-		ArrayList <Official> offical = d.getOfficial();
-		Collections.shuffle(offical);
-		return 	offical. get(0);
+	//	ArrayList <Official> offical = d.getOfficial();
+	//	Collections.shuffle(offical);
+		return 	d.getOfficial(). get(0);
 
 	}
 

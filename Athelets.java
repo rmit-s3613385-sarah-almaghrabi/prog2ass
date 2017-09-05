@@ -21,7 +21,7 @@ abstract class Athelets extends Participants   {
 	}
 
 
-	public static Comparator<Athelets> TimeComparator = new Comparator<Athelets>() {
+	protected static Comparator<Athelets> TimeComparator = new Comparator<Athelets>() {
 
 		public int compare(Athelets a1, Athelets a2) {
 			int firstPlayer = a1.getTime();
@@ -36,7 +36,7 @@ abstract class Athelets extends Participants   {
 		
 
 
-		public static Comparator<Athelets> PointComparator = new Comparator<Athelets>() {
+		protected static Comparator<Athelets> PointComparator = new Comparator<Athelets>() {
 
 			public int compare(Athelets a1, Athelets a2) {
 				int firstPlayer = a1.getPoint();
@@ -70,18 +70,18 @@ abstract class Athelets extends Participants   {
 
 
 			public void print() { 
-				System.out.format("%8s%15s%15s%15s", this.getId(), this.getName(),this.getTime(), this.getPoint());
+				System.out.format("%10s%15s%15s%15s", this.getId(), this.getName(),this.getTime(), this.getPoint());
 				System.out.println();
 
 			}
 			public void print2() { 
-				System.out.format("%8s%15s%15s", this.getId(), this.getName(),this.getTime());
+				System.out.format("%10s%15s%15s", this.getId(), this.getName(),this.getTime());
 				System.out.println();
 
 			}
 
 			public void print3() {
-				System.out.format("%8s%15s",  this.getId(), this.getName());
+				System.out.format("%10s%15s",  this.getId(), this.getName());
 				System.out.println();
 	
 			}

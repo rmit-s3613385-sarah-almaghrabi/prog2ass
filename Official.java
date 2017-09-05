@@ -27,20 +27,56 @@ public class Official  extends Participants{
 		} catch (InterruptedException e) {
 		}
 		timer.stop();
-		
+
 
 		System.out.print("Game  Finished .. "  );
 		System .out .println(sdf.format(Calendar.getInstance().getTime()));
-	
+
 	}
 
 
 
 	public void rewardWinners(ArrayList< Athelets> athelets) {
-		athelets.get(0).setPoint(5 );
-		athelets.get(1).setPoint(3 );
-		athelets.get(2).setPoint(1 );
-	}
+		int frist =athelets.get(0).getTime(); 
+		int second =0;
+		int third=0; 
+		for(Athelets a : athelets){
+
+			if(a.getTime()== frist)
+				continue;
+			else 
+			{
+				second=a.getTime();
+				break;
+			}
+
+		}
+		for(Athelets a : athelets){
+
+			if(a.getTime()== frist)
+				continue;
+			else if (a.getTime()== second)
+
+				continue;
+			else 
+			{
+				third=a.getTime();
+				break;
+			}
+
+		} 
+		for(Athelets a : athelets){
+
+			if(a.getTime()== frist)
+				 a.setPoint(5);
+			else if (a.getTime()== second)
+				 a.setPoint(3);
+			else if(a.getTime()== third)
+				 a.setPoint(1);
+		}
+
+		 
+ 	}
 
 	public void showResults(ArrayList< Athelets> athelets){
 		rewardWinners(athelets);
@@ -51,8 +87,9 @@ public class Official  extends Participants{
 		for(Athelets a: athelets){
 			a.print();
 		}
-		
-		
+		System.out.println("----------------------------------------------------");
+
+
 	}
 
 }

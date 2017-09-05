@@ -4,7 +4,7 @@ package rmit.cosc.s3613385;
 
 public class Ozlympic {
 
-	
+	public static Driver d = new Driver ();
 	public static void main(String [] args){
 		
 		String gameID  = null; 
@@ -19,7 +19,7 @@ public class Ozlympic {
 		};
 
 		Menu menu = new Menu("MAIN" , mOptions);
-		Driver d = new Driver ();
+		
         int chose ;
 		do{
 			menu.display();
