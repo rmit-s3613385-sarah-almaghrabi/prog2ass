@@ -42,7 +42,6 @@ public class Data {
 		athelets.add(  new Swimmer("ATH_S 10", "Nuha", 29, "VIC"));
 		athelets.add(  new Swimmer("ATH_S 11", "Byan", 29, "VIC"));
 		athelets.add(  new Swimmer("ATH_S 12", "Raed", 29, "VIC"));
-	//	Collections.shuffle(athelets);
 	}
 
 	public void createCyclists() {
@@ -58,7 +57,6 @@ public class Data {
 		athelets.add(  new Cyclist("ATH_C 10", "Rana", 24, "SA")); 
 		athelets.add(  new Cyclist("ATH_C 11", "Basel", 24, "SA")); 
 		athelets.add(  new Cyclist("ATH_C 12", "Hamad", 24, "SA")); 
-		Collections.shuffle(athelets);
 	}
 
 	public void createSprinters() {
@@ -76,7 +74,6 @@ public class Data {
 		athelets.add(  new Sprinter("ATH_SP 11", "Nafee", 24, "SA")); 
 		athelets.add(  new Sprinter("ATH_SP 12", "Pavan", 24, "SA")); 
 		athelets.add(  new Sprinter("ATH_SP 13", "Komal", 24, "SA")); 
-		Collections.shuffle(athelets);
 	}
 
 
@@ -90,7 +87,6 @@ public class Data {
 		athelets.add(  new Swimmer("ATH_SU 6", "Jacob", 22, "WA")); 
 		athelets.add(  new Cyclist("ATH_SU 7", "William", 27, "Qld")); 
 		athelets.add(  new Sprinter("ATH_SU 8", "Hamad", 24, "SA")); 
-		Collections.shuffle(athelets);
 	}
 
 
@@ -116,7 +112,8 @@ public class Data {
 			createSprinters();
 		else if (sport.equals("cycling"))
 			createCyclists() ;
-		else
+
+
 			createSuperAth();
 
 

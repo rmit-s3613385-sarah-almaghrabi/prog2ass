@@ -8,7 +8,7 @@ public class Ozlympic {
 	public static void main(String [] args){
 		
 		String gameID  = null; 
-		String prediction=null;
+		int prediction = -1;
 		String [] mOptions = {
 				"Select a game to run         "
 				,"Predict the winner of the game	  "

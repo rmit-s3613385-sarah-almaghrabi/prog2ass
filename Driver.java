@@ -26,7 +26,7 @@ public class Driver {
 	// to keep history of all games have been played
 	HashMap<String , Athelets[] > history = new HashMap<String , Athelets[] > ();
 
-	String prediction=null;  
+	int prediction=-1;  
 
 	public String selectGame(String gameID){
 		//check if there is already a selected game 
@@ -55,29 +55,24 @@ public class Driver {
 					gameID = Game.createGameID('s', swimGameCounter.getAndIncrement());
 					System.out.println( "Swimming Game " + gameID +" Selected .. "  );
 					Game.creatPlayers("swimming");	
-					//	getPlayers();
-					showPlayers();
-					selectPlayers(); 
 
 				}
-				return gameID; 
+				break;
 				case 2 :
 				{ 
 					gameID = Game.createGameID('r', runGameCounter.getAndIncrement());
 					System.out.println( "Running Game " + gameID +" Selected .. "  );
 					Game.creatPlayers("running");	
-					getPlayers();
 				}
-				return gameID; 
+				break;
 				case 3 : 
 				{ 
 					gameID = Game.createGameID('c', cyclGameCounter.getAndIncrement());
 					System.out.println( "Cycling Game " + gameID +" Selected .. "  );
 					Game.creatPlayers("cycling");
-					getPlayers();
 				}
+				break;
 
-				return gameID; 
 				case 4 : 
 					// back to menu  
 					return null;
@@ -88,6 +83,13 @@ public class Driver {
 
 				}
 
+				int playersCount= showPlayers();
+				if(!selectPlayers(playersCount))
+					//return to menu and cancel selection
+					gameID=null; 
+
+
+				return gameID; 
 			}while(chose!=4);
 
 		}
@@ -96,33 +98,94 @@ public class Driver {
 	}
 
 
-	public void selectPlayers() {
-		int input []=new int[8]; 
+	public boolean selectPlayers(int playersCount) {
+		int choices []=new int[8]; 
+		int input;
 		int count =0 , indx =0;
 		System.out.println("to run the game you must chose 5 to 8 players: "
-				+ "\n     ( Write their number or 0 to finish and exit ) ");
+				+ "\n     ( Write their number, (0) to finish or (-1) to exit ) "
+				+ "\nNote: You will not be able to edit the numbers that already entered. ");
 		do{
+			if(count ==8 )
+				break;
 			System.out.println("chose the " +(count +1)+"th player" );
-			input[indx++]= Integer.parseInt(sn.next());
+			try {
+				input = Integer.parseInt(sn.next());
 
-			if(input[indx-1]==0 )
-
-				if(count <5 )
+				if(input==0 )
 				{
-					System.out.println("You have to have at least 5 players " );
+					if(count <5 )
+					{
+						System.out.println("You have to have at least 5 players " );
+						continue;
+
+					}else{	
+						System.out.println((count) +" players selected " );
+
+						break;
+					}
+				}else if(input==-1 ){
+					// back to menu  
+					return false ;
+
+				}
+				else if (input> (playersCount-1) || input<1) {
+					System.out.println("this player number is not exist");
 					continue;
+				}else {
+					if (!checkDuplicate(choices, input))
+						choices[indx] = input;
+					else {
+						System.out.println("this player has been already chosen ");
+						continue;
+					} 
+				}
+				count++;
+				indx++;
+			} catch (NumberFormatException e) { 
+				System.out.println("Numbers only");
+			}
 
-				}else 
-					break; 
+		}while( true  );
 
-			count++;
-
-		}while( (count < 9 || count <5) );
+		getPlayers(choices);
+		return true;
 
 	}
 
 
-	public String startGame(String gameID, String prediction){
+	private boolean checkDuplicate(int[] choices, int input) {
+
+		for (int i = 0 ; i<choices.length ; i++)
+			if(choices[i]==0)
+				return false;
+			else if(choices[i]==input )
+				return true;
+		return false;
+
+
+	}
+
+
+	private void getPlayers(int[] choices) {
+
+		Athelets ath;
+
+		for (int i =0 ; i<choices.length &&choices[i] !=0;i++){
+			ath =  Game.getPlayers((choices[i]-1));
+
+			if(ath!=null)
+				athelets.add(ath);
+			else
+				break; 
+		}
+
+
+
+	}
+
+
+	public String startGame(String gameID, int prediction2){
 		if(gameID==null)
 		{
 			System.out.println("Sorry you have to select a game first");
@@ -160,7 +223,7 @@ public class Driver {
 
 				System.out.println( "		Refree [ "+ refree.getName()+ " ]" );
 
-				if(prediction!=null)
+				if(prediction!=-1)
 				{
 					checkPrediction(prediction);
 				} 
@@ -196,7 +259,7 @@ public class Driver {
 		athelets.removeAll(athelets);
 	}
 
-	public void checkPrediction(String prediction) {
+	public void checkPrediction(int prediction) {
 		boolean found = false ; 
 		for(Athelets a : athelets){
 			if(a.getPoint()==5)
@@ -219,7 +282,7 @@ public class Driver {
 			System.out.println("----------------------------------------------------");
 
 		}
-		prediction  = null;
+		prediction  = -1;
 	}
 
 	public void getPlayers() {
@@ -239,27 +302,32 @@ public class Driver {
 		}
 	}
 
-	public void showPlayers() {
+	public int showPlayers() {
+
+
 		int i=0;
 		Athelets ath;
 		do{ 
 			ath =  Game.getPlayers(i++);
 			if(ath!=null)
-				System.out.println((i) + "-  \t" + ath.getName() );
+				System.out.println((i) + "- " + ath.getName() );
 			//athelets.add(ath);
 			else
 				break; 
 
 		}while(true);
 
+		return i ; 
 		/*	i=1;
 		for( Athelets a: athelets){
 			System.out.println(i++ + "-  \t" + a.getName() );
 
 		}*/ 
+
+
 	}
 
-	public String predictWinner(String gameID) {
+	public int predictWinner(String gameID) {
 		if(gameID==null)
 		{
 			System.out.println("Sorry you have to select a game first");
@@ -268,106 +336,108 @@ public class Driver {
 
 			boolean notValid =true;
 			System.out.println(" ******** Players List *********");
-			System.out.format("%8s%15s", "ID", "NAME" );
+			System.out.format("%10s%15s", "ID", "NAME" );
 			System.out.println("\n--------------------------------------");
 
+			int i=1;
 			for(Athelets a: athelets )
-				a.print3();
+			{
+				System.out.print(i++);
+				System.out.format("-%11s%15s",a.getId(), a.getName() );
+				System.out.println( );
+			}
+			//		System.out.println(i++ +" -" + a.getId() + "  " + a.getName() );
+
 			System.out.println("\n----------------------------------------------------");
 
 
-			System.out.println("NOTE : The format should be exactly similar to the ID shown ");
-			System.out.println("Enter the ID of your predected winner, or 0 to return :  ");
+			System.out.println("Enter the number of your predected winner, or 0 to return :  ");
 			do {
-				prediction = sn.nextLine();
-				if(prediction.trim().length()==0){
-					System.out.println("You didn't enter an id .. try again ..");
-					notValid=true; 
-				} else if( prediction.trim().equals("0")){
-					return null; 
-				} else{
-
-					for(Athelets s: athelets )
-						if( s.getId().equals(prediction.trim().toUpperCase())  )
-						{
-							System.out.println("Got your Prediction .. " +s.getName());
-
-							notValid =false;
-						}
-					if(notValid )
+				try {
+					prediction = Integer.parseInt(sn.next());
+					if (prediction == 0) {
+						return -1;
+					} else if (prediction > 0 && prediction < athelets.size()) {
+						System.out.println("Got your Prediction .. " + athelets.get(prediction - 1).getName());
+						break;
+					} else
 						System.out.println("This ID doesnt exist .. try again ..");
+				} catch (Exception e) {
+					System.out.println("Numbers Only ..");
+
 				}
-			} while ( notValid);
+			
+		} while ( true);
 
-			return prediction.trim().toUpperCase();
-		}
-		return gameID;
+	 
 	}
+		return prediction; 
+}
 
 
-	public void displayAllGames() {
+public void displayAllGames() {
 
-		if(history.isEmpty())
-			System.out.println("Sorry, the list is empty !! no game has been played before .. ");
-		else
-		{
-			for (String name: this.history.keySet()){
-
-				System.out.println("\n=====================================");
-				System.out.println( name);
-				System.out.format("%10s%15s%15s", "ID", "NAME", "TIME"  );
-				System.out.println("\n-------------------------------------");
-
-				for (Athelets a : history.get(name)) 
-					a.print2();
-			}
-		} 
-
-
-
-	}
-
-
-	public void displayAllAthlets() {
-		if(results.isEmpty())
-			System.out.println("Sorry, the list is empty !! no game has been played before .. ");
-		else
-		{  
+	if(history.isEmpty())
+		System.out.println("Sorry, the list is empty !! no game has been played before .. ");
+	else
+	{
+		for (String name: this.history.keySet()){
 
 			System.out.println("\n=====================================");
-			System.out.println("This is the list of athelets who already have played game ");
-			System.out.format("%10s%15s%15s", "ID", "NAME", "POINTS"  );
+			System.out.println( name);
+			System.out.format("%10s%15s%15s", "ID", "NAME", "TIME"  );
 			System.out.println("\n-------------------------------------");
-			MyComparator comparator = new MyComparator(results);
-			Map<String, Integer> newMap = new TreeMap<String, Integer>(comparator);
-			newMap.putAll(results);
 
-			for (String name: newMap.keySet()){
-				String [] line= name.split("\t");
-				System.out.format("%10s%15s%15d", line[0], line[1], results.get(name)   );
-				System.out.println();
-
-			} 
-
+			for (Athelets a : history.get(name)) 
+				a.print2();
 		}
+	} 
+
+
+
+}
+
+
+public void displayAllAthlets() {
+	if(results.isEmpty())
+		System.out.println("Sorry, the list is empty !! no game has been played before .. ");
+	else
+	{  
+
+		System.out.println("\n=====================================");
+		System.out.println("This is the list of athelets who already have played game ");
+		System.out.format("%10s%15s%15s", "ID", "NAME", "POINTS"  );
+		System.out.println("\n-------------------------------------");
+		MyComparator comparator = new MyComparator(results);
+		Map<String, Integer> newMap = new TreeMap<String, Integer>(comparator);
+		newMap.putAll(results);
+
+		for (String name: newMap.keySet()){
+			String [] line= name.split("\t");
+			System.out.format("%10s%15s%15d", line[0], line[1], results.get(name)   );
+			System.out.println();
+
+		} 
+
 	}
+}
 
-	// this is inner class to sort the treeMapp by value 
-	// this part of code has been taken from this link:
-	// https://stackoverflow.com/questions/109383/sort-a-mapkey-value-by-values-java
+// this is inner class to sort the treeMapp by value 
+// this part of code has been taken from this link:
+// https://stackoverflow.com/questions/109383/sort-a-mapkey-value-by-values-java
 
-	class MyComparator implements Comparator<Object> {
-		Map<String, Integer> map;
-		public MyComparator(Map<String, Integer> map) {
-			this.map = map;
-		}
-		public int compare(Object o1, Object o2) {
-
-			if (map.get(o2) == map.get(o1))
-				return 1;
-			else
-				return ((Integer) map.get(o2)).compareTo((Integer) map.get(o1));
-
-		}
+class MyComparator implements Comparator<Object> {
+	Map<String, Integer> map;
+	public MyComparator(Map<String, Integer> map) {
+		this.map = map;
 	}
+	public int compare(Object o1, Object o2) {
+
+		if (map.get(o2) == map.get(o1))
+			return 1;
+		else
+			return ((Integer) map.get(o2)).compareTo((Integer) map.get(o1));
+
+	}
+}
 }
